@@ -53,8 +53,6 @@
     import data from './data.json';
     import Loader from 'loaderz';
 
-    let loader = new Loader();
-
     export default {
         data: function () {
             return {
@@ -85,12 +83,16 @@
                 }
             },
             preloadImages() {
+                let loader = new Loader();
                 for (let [index, image] of this.currentImage.variants.entries()) {
                     if (index !== 0) {
                         loader.queue('image', image.path);
                     }
                 }
-                loader.start();
+                setTimeout(() => {
+                    loader.start();
+                }, 1000)
+
             },
         },
         computed: {
