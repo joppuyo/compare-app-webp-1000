@@ -13,6 +13,7 @@
     <div class="middle dragscroll">
         <img v-bind:src="this.currentVariant.path"
              v-bind:class="{pixelate: internalPixelate}"
+             v-on:load="imageLoaded = true"
              v-bind:style="{
             height: `${currentImage.height * this.internalScale / 100}px`,
             minHeight: `${currentImage.height * this.internalScale / 100}px`,
@@ -23,7 +24,7 @@
         <div class="bottom-bar">
             <div class="bottom-bar-left">
             <div class="select-container">
-                <select v-model="currentIndex">
+                <select v-model="currentIndex" v-on:change="imageChanged">
                     <option v-for="(image, index) in data" v-bind:value="index">{{image.image_name}}</option>
                 </select>
                 <div class="select-container-icon" v-html="require('!raw-loader!./arrow-down.svg')"></div>
@@ -63,15 +64,21 @@
                 internalScale: data.default_scale,
                 zoomOptions: [25, 50, 100, 200, 300, 400],
                 pixelate: true,
-                loader: null,
+                imageLoaded: false,
             }
         },
         mounted() {
             dragscroll.reset();
             this.calculateScale();
-            this.preloadImages();
         },
         methods: {
+            imageChanged() {
+                this.imageLoaded = false;
+                this.currentVariantIndex = 0;
+                this.calculateScale();
+                this.preloadImages();
+                this.scale = 'fit';
+            },
             setCurrentVariantIndex(index) {
                 this.currentVariantIndex = index;
             },
@@ -89,10 +96,7 @@
                         loader.queue('image', image.path);
                     }
                 }
-                setTimeout(() => {
-                    loader.start();
-                }, 1000)
-
+                loader.start();
             },
         },
         computed: {
@@ -107,15 +111,14 @@
             }
         },
         watch: {
-            currentImage: function (val) {
-                this.currentVariantIndex = 0;
-                this.calculateScale();
-                this.preloadImages();
-                this.scale = 'fit';
-            },
             scale: function (val) {
                 this.calculateScale();
             },
+            imageLoaded: function (val) {
+                if (val === true) {
+                    this.preloadImages();
+                }
+            }
         },
     }
 </script>
