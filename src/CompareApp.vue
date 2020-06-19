@@ -76,7 +76,6 @@
                 this.imageLoaded = false;
                 this.currentVariantIndex = 0;
                 this.calculateScale();
-                this.preloadImages();
                 this.scale = 'fit';
             },
             setCurrentVariantIndex(index) {
